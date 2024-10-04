@@ -43,7 +43,7 @@ const App = () => {
 
       page.drawText(fieldText, {
         x: textPosition.x,
-        y: height - textPosition.y,
+        y: height - textPosition.y - fieldSize, // Adjust y-coordinate
         size: fieldSize,
         color: rgb(0, 0, 0),
       });
@@ -173,7 +173,7 @@ const App = () => {
                 cursor: "move",
                 userSelect: "none",
                 backgroundColor: "rgba(255, 255, 0, 0.3)",
-                padding: "5px",
+                // padding: "5px",
                 fontSize: `${fieldSize}px`,
               }}
             >
