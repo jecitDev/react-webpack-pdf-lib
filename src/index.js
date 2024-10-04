@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Document, Page } from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf";
 import { PDFDocument, rgb } from "pdf-lib";
-import { pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -19,6 +18,9 @@ const App = () => {
   const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
   const [textAdded, setTextAdded] = useState(false);
+  const [pdfDimensions, setPdfDimensions] = useState({ width: 0, height: 0 });
+  const [fieldText, setFieldText] = useState("Sample Text Field");
+  const [fieldSize, setFieldSize] = useState(20);
   const pdfContainerRef = useRef(null);
 
   const handleFileUpload = async (event) => {
@@ -39,10 +41,10 @@ const App = () => {
       const page = pages[currentPage - 1];
       const { height } = page.getSize();
 
-      page.drawText("Sample Text Field", {
+      page.drawText(fieldText, {
         x: textPosition.x,
         y: height - textPosition.y,
-        size: 20,
+        size: fieldSize,
         color: rgb(0, 0, 0),
       });
 
@@ -102,13 +104,31 @@ const App = () => {
     );
   };
 
+  const onPageLoadSuccess = ({ width, height }) => {
+    setPdfDimensions({ width, height });
+  };
+
   return (
     <div>
       <h1>PDF Uploader and Editor</h1>
       <input type="file" accept=".pdf" onChange={handleFileUpload} />
       {pdfFile && (
         <>
-          <button onClick={addTextField}>Add Text Field</button>
+          <div>
+            <input
+              type="text"
+              value={fieldText}
+              onChange={(e) => setFieldText(e.target.value)}
+              placeholder="Enter field text"
+            />
+            <input
+              type="number"
+              value={fieldSize}
+              onChange={(e) => setFieldSize(Number(e.target.value))}
+              placeholder="Enter font size"
+            />
+            <button onClick={addTextField}>Add Text Field</button>
+          </div>
           <button onClick={downloadModifiedPdf}>Download Modified PDF</button>
           <div>
             <button onClick={goToPreviousPage} disabled={currentPage <= 1}>
@@ -123,7 +143,12 @@ const App = () => {
           </div>
           <div
             ref={pdfContainerRef}
-            style={{ position: "relative" }}
+            style={{
+              position: "relative",
+              border: "1px solid #ccc",
+              width: `${pdfDimensions.width}px`,
+              height: `${pdfDimensions.height}px`,
+            }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -133,7 +158,11 @@ const App = () => {
               file={pdfFile}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}
             >
-              <Page pageNumber={currentPage} />
+              <Page
+                pageNumber={currentPage}
+                onLoadSuccess={onPageLoadSuccess}
+                width={pdfDimensions.width}
+              />
             </Document>
 
             <div
@@ -145,9 +174,10 @@ const App = () => {
                 userSelect: "none",
                 backgroundColor: "rgba(255, 255, 0, 0.3)",
                 padding: "5px",
+                fontSize: `${fieldSize}px`,
               }}
             >
-              Sample Text Field
+              {fieldText}
             </div>
           </div>
         </>
