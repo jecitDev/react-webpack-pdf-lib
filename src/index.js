@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 import { PDFDocument, rgb } from "pdf-lib";
+import { pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 // Set up the worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjs.GlobalWorkerOptions.workerSrc =
-  new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+// pdfjs.GlobalWorkerOptions.workerSrc = pdfjs.GlobalWorkerOptions.workerSrc =
+//   new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const App = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [pdfDoc, setPdfDoc] = useState(null);
   const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
@@ -24,16 +29,17 @@ const App = () => {
       setPdfDoc(pdfDoc);
       setPdfFile(file);
       setTextAdded(false);
+      setCurrentPage(1);
     }
   };
 
   const addTextField = async () => {
     if (pdfDoc) {
       const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      const { height } = firstPage.getSize();
+      const page = pages[currentPage - 1];
+      const { height } = page.getSize();
 
-      firstPage.drawText("Sample Text Field", {
+      page.drawText("Sample Text Field", {
         x: textPosition.x,
         y: height - textPosition.y,
         size: 20,
@@ -86,6 +92,16 @@ const App = () => {
     }
   }, [textAdded]);
 
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) =>
+      prevPage < numPages ? prevPage + 1 : prevPage
+    );
+  };
+
   return (
     <div>
       <h1>PDF Uploader and Editor</h1>
@@ -94,6 +110,17 @@ const App = () => {
         <>
           <button onClick={addTextField}>Add Text Field</button>
           <button onClick={downloadModifiedPdf}>Download Modified PDF</button>
+          <div>
+            <button onClick={goToPreviousPage} disabled={currentPage <= 1}>
+              Previous Page
+            </button>
+            <span>
+              Page {currentPage} of {numPages}
+            </span>
+            <button onClick={goToNextPage} disabled={currentPage >= numPages}>
+              Next Page
+            </button>
+          </div>
           <div
             ref={pdfContainerRef}
             style={{ position: "relative" }}
@@ -106,25 +133,22 @@ const App = () => {
               file={pdfFile}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}
             >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page key={`page_${index + 1}`} pageNumber={index + 1} />
-              ))}
+              <Page pageNumber={currentPage} />
             </Document>
-            {
-              <div
-                style={{
-                  position: "absolute",
-                  left: textPosition.x,
-                  top: textPosition.y,
-                  cursor: "move",
-                  userSelect: "none",
-                  backgroundColor: "rgba(255, 255, 0, 0.3)",
-                  padding: "5px",
-                }}
-              >
-                Sample Text Field
-              </div>
-            }
+
+            <div
+              style={{
+                position: "absolute",
+                left: textPosition.x,
+                top: textPosition.y,
+                cursor: "move",
+                userSelect: "none",
+                backgroundColor: "rgba(255, 255, 0, 0.3)",
+                padding: "5px",
+              }}
+            >
+              Sample Text Field
+            </div>
           </div>
         </>
       )}
