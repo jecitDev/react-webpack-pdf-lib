@@ -72,7 +72,7 @@ const App = () => {
           pdfY: height - textPosition.y - fieldSize,
           page: currentPage,
           width: 100, // Default width
-          height: fieldSize + 10,
+          height: fieldSize,
         },
       ]);
       setFieldText("");
@@ -84,8 +84,11 @@ const App = () => {
   const handleFieldResize = (index, size) => {
     setFields((prevFields) => {
       const newFields = [...prevFields];
+      const field = newFields[index];
+      const heightDiff = size.height - field.height;
       newFields[index] = {
         ...newFields[index],
+        pdfY: field.pdfY - heightDiff,
         width: size.width,
         height: size.height,
       };
@@ -131,7 +134,7 @@ const App = () => {
           newFields[activeField] = {
             ...newFields[activeField],
             pdfX: x,
-            pdfY: height - y - fieldSize,
+            pdfY: height - y - newFields[activeField].height,
             position: { x, y },
           };
           return newFields;
@@ -203,7 +206,8 @@ const App = () => {
               fields.forEach((field) => {
                 page.drawRectangle({
                   x: field.pdfX,
-                  y: height - field.position.y - field.height,
+                  y: field.pdfY,
+                  // y: height - field.position.y - field.height,
                   width: field.width,
                   height: field.height,
                   borderColor: rgb(0, 0, 0),
@@ -225,7 +229,7 @@ const App = () => {
 
           <div className="flex gap-2 mt-2">
             <div className="flex flex-col gap-2 ">
-              <input
+              {/* <input
                 className="border border-gray-300 rounded-md p-2"
                 type="text"
                 value={fieldText}
@@ -238,7 +242,7 @@ const App = () => {
                 value={fieldSize}
                 onChange={(e) => setFieldSize(Number(e.target.value))}
                 placeholder="Enter font size"
-              />
+              /> */}
               <button
                 className="bg-blue-500 text-white p-2 rounded-md"
                 onClick={addTextField}
