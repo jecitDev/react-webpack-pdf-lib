@@ -243,12 +243,12 @@ const App = () => {
                 onChange={(e) => setFieldSize(Number(e.target.value))}
                 placeholder="Enter font size"
               /> */}
-              <button
+              {/* <button
                 className="bg-blue-500 text-white p-2 rounded-md"
                 onClick={addTextField}
               >
                 Add Text Field
-              </button>
+              </button> */}
               <button
                 className={`bg-blue-500 text-white p-2 rounded-md ${
                   showField && fieldText === "Signature" ? "bg-blue-700" : ""
@@ -327,9 +327,16 @@ const App = () => {
                       userSelect: "none",
                       backgroundColor: "gray",
                       fontSize: `${fieldSize}px`,
+                      zIndex: 1002,
                     }}
                   >
                     {fieldText}
+                    <button
+                      className="text-black text-3xl absolute  "
+                      onClick={addTextField}
+                    >
+                      +
+                    </button>
                   </div>
                 )}
                 {fields.map((field, index) => (
