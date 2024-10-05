@@ -299,8 +299,10 @@ const App = () => {
                 style={{
                   position: "relative",
                   border: "1px solid #ccc",
-                  width: `${pdfDimensions.width}px`,
-                  height: `${pdfDimensions.height}px`,
+                  width: `${pdfDimensions.width + 2}px`,
+                  height: `${pdfDimensions.height + 2}px`,
+                  overflow: "hidden",
+                  padding: "1px",
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
