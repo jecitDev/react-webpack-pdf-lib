@@ -250,19 +250,25 @@ const App = () => {
                 Add Text Field
               </button>
               <button
-                className="bg-blue-500 text-white p-2 rounded-md"
+                className={`bg-blue-500 text-white p-2 rounded-md ${
+                  showField && fieldText === "Signature" ? "bg-blue-700" : ""
+                }`}
                 onClick={() => {
                   setFieldText("Signature");
                   setShowField(!showField);
+                  setTextPosition({ x: 50, y: 50 });
                 }}
               >
                 Signature
               </button>
               <button
-                className="bg-blue-500 text-white p-2 rounded-md"
+                className={`bg-blue-500 text-white p-2 rounded-md ${
+                  showField && fieldText === "Email" ? "bg-blue-700" : ""
+                }`}
                 onClick={() => {
                   setFieldText("Email");
                   setShowField(!showField);
+                  setTextPosition({ x: 50, y: 50 });
                 }}
               >
                 Email
