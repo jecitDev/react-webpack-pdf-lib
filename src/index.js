@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Document, Page, pdfjs } from "react-pdf";
 import { PDFDocument, rgb } from "pdf-lib";
+import { Resizable } from "re-resizable";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -46,18 +47,18 @@ const App = () => {
       const page = pages[currentPage - 1];
       const { height } = page.getSize();
 
-      page.drawText(fieldText, {
-        x: textPosition.x,
-        y: height - textPosition.y - fieldSize, // Adjust y-coordinate
-        size: fieldSize,
-        color: rgb(0, 0, 0),
-      });
+      // page.drawText(fieldText, {
+      //   x: textPosition.x,
+      //   y: height - textPosition.y - fieldSize, // Adjust y-coordinate
+      //   size: fieldSize,
+      //   color: rgb(0, 0, 0),
+      // });
 
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-      const newFile = new File([blob], "modified.pdf", {
-        type: "application/pdf",
-      });
+      // const pdfBytes = await pdfDoc.save();
+      // const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      // const newFile = new File([blob], "modified.pdf", {
+      //   type: "application/pdf",
+      // });
       // setPdfFile(newFile);
       // setPdfDoc(await PDFDocument.load(await newFile.arrayBuffer()));
       // setTextAdded(true);
@@ -70,11 +71,26 @@ const App = () => {
           pdfX: textPosition.x,
           pdfY: height - textPosition.y - fieldSize,
           page: currentPage,
+          width: 100, // Default width
+          height: fieldSize + 10,
         },
       ]);
       setFieldText("");
+      setTextPosition({ x: 50, y: 50 });
       // console.log(fields);
     }
+  };
+
+  const handleFieldResize = (index, size) => {
+    setFields((prevFields) => {
+      const newFields = [...prevFields];
+      newFields[index] = {
+        ...newFields[index],
+        width: size.width,
+        height: size.height,
+      };
+      return newFields;
+    });
   };
 
   const downloadModifiedPdf = async () => {
@@ -177,6 +193,35 @@ const App = () => {
           >
             Reset Fields
           </button>
+          <button
+            className="bg-green-500 text-white p-2 rounded-md"
+            onClick={async () => {
+              const pages = pdfDoc.getPages();
+              const page = pages[currentPage - 1];
+              const { height } = page.getSize();
+
+              fields.forEach((field) => {
+                page.drawRectangle({
+                  x: field.pdfX,
+                  y: height - field.position.y - field.height,
+                  width: field.width,
+                  height: field.height,
+                  borderColor: rgb(0, 0, 0),
+                  borderWidth: 1.5,
+                });
+              });
+
+              const pdfBytes = await pdfDoc.save();
+              const blob = new Blob([pdfBytes], { type: "application/pdf" });
+              const newFile = new File([blob], "modified.pdf", {
+                type: "application/pdf",
+              });
+              setPdfFile(newFile);
+              setPdfDoc(await PDFDocument.load(await newFile.arrayBuffer()));
+            }}
+          >
+            Write PDF
+          </button>
 
           <div className="flex gap-2 mt-2">
             <div className="flex flex-col gap-2 ">
@@ -278,24 +323,42 @@ const App = () => {
                   </div>
                 )}
                 {fields.map((field, index) => (
-                  <div
+                  <Resizable
                     key={index}
+                    size={{ width: field.width, height: field.height }}
+                    onResizeStop={(e, direction, ref, d) => {
+                      handleFieldResize(index, {
+                        width: field.width + d.width,
+                        height: field.height + d.height,
+                      });
+                    }}
                     style={{
                       position: "absolute",
                       left: field.position.x,
                       top: field.position.y,
-                      cursor: "move",
-                      userSelect: "none",
-                      backgroundColor: "rgba(255, 255, 0, 0.3)",
-                      fontSize: `${fieldSize}px`,
-                      zIndex: 1000,
+                      zIndex: 1001,
                       visibility:
                         field.page !== currentPage ? "hidden" : "visible",
                     }}
-                    onMouseDown={(e) => handleFieldMouseDown(e, index)}
                   >
-                    {field.text}
-                  </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        cursor: "move",
+                        userSelect: "none",
+                        backgroundColor: "rgba(255, 255, 0, 0.3)",
+                        fontSize: `${fieldSize}px`,
+                        zIndex: 1000,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      onMouseDown={(e) => handleFieldMouseDown(e, index)}
+                    >
+                      {field.text}
+                    </div>
+                  </Resizable>
                 ))}
               </div>
             </div>

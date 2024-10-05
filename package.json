@@ -13,6 +13,7 @@
   "dependencies": {
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.6.82",
+    "re-resizable": "^6.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pdf": "^9.1.1"
