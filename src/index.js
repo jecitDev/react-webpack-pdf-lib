@@ -28,6 +28,7 @@ const App = () => {
   const [fieldText, setFieldText] = useState("");
   const [fieldSize, setFieldSize] = useState(100);
   const pdfContainerRef = useRef(null);
+  const [showRoleOptions, setShowRoleOptions] = useState(null);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -170,6 +171,18 @@ const App = () => {
 
   const onPageLoadSuccess = ({ width, height }) => {
     setPdfDimensions({ width, height });
+  };
+
+  const assignRole = (index, role) => {
+    setFields((prevFields) => {
+      const newFields = [...prevFields];
+      newFields[index] = {
+        ...newFields[index],
+        role: role,
+      };
+      return newFields;
+    });
+    setShowRoleOptions(null);
   };
 
   return (
@@ -407,6 +420,32 @@ const App = () => {
                       onMouseDown={(e) => handleFieldMouseDown(e, index)}
                     >
                       {field.text}
+                      <div className="absolute bottom-0 right-0">
+                        <button
+                          className="text-black text-xl absolute -right-8 bottom-0 bg-white rounded-full w-6 h-6 flex items-center justify-center"
+                          onClick={() => setShowRoleOptions(index)}
+                        >
+                          ▼
+                        </button>
+                        {showRoleOptions === index && (
+                          <div className="absolute bottom-8 right-0 bg-white border border-gray-300 rounded shadow-md">
+                            {["User1", "User2", "User3"].map((role) => (
+                              <button
+                                key={role}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() => assignRole(index, role)}
+                              >
+                                {role}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {field.role && (
+                        <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded">
+                          {field.role}
+                        </div>
+                      )}
                     </div>
                   </Resizable>
                 ))}
