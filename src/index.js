@@ -327,20 +327,25 @@ const App = () => {
                       top: textPosition.y,
                       cursor: "move",
                       userSelect: "none",
-                      backgroundColor: "gray",
+                      backgroundColor: "#ccc",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       // fontSize: `${fieldSize}px`,
                       width: fieldSize,
                       height: fieldSize,
                       zIndex: 1002,
                     }}
                   >
-                    {fieldText}
-                    <button
-                      className="text-black text-3xl absolute  "
-                      onClick={addTextField}
-                    >
-                      +
-                    </button>
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {fieldText}
+                      <button
+                        className="text-black text-3xl absolute -top-2 -right-2 bg-white rounded-full w-6 h-6 flex items-center justify-center"
+                        onClick={addTextField}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 )}
                 {fields.map((field, index) => (
