@@ -173,62 +173,81 @@ const App = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen ">
-      <h1 className="text-2xl font-bold">PDF Uploader and Editor</h1>
+    <div className="flex flex-col min-h-screen">
+      <div className="flex justify-between bg-[#034A5A] text-white p-2 w-full">
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold">
+            Document: MEDICAL RESUME_001_001.pdf
+          </h1>
+          <p>created by : Jane Doe</p>
+        </div>
+        <div className="flex gap-2 items-center">
+          <button className="bg-[#034A5A] border border-[white] rounded-md flex items-center justify-center w-24 h-10">
+            <p>Send</p>
+          </button>
+          <button className="bg-[#034A5A] border border-[white] rounded-md flex items-center justify-center w-24 h-10">
+            <p>Sign Now</p>
+          </button>
+        </div>
+      </div>
+
       <input type="file" accept=".pdf" onChange={handleFileUpload} />
+
       {pdfFile && (
         <>
-          <button
-            className="bg-green-500 text-white p-2 rounded-md"
-            onClick={downloadModifiedPdf}
-          >
-            Download Modified PDF
-          </button>
-          <button
-            className="bg-green-500 text-white p-2 rounded-md"
-            onClick={() => console.log(fields)}
-          >
-            Console Fields
-          </button>
-          <button
-            className="bg-green-500 text-white p-2 rounded-md"
-            onClick={() => setFields([])}
-          >
-            Reset Fields
-          </button>
-          <button
-            className="bg-green-500 text-white p-2 rounded-md"
-            onClick={async () => {
-              const pages = pdfDoc.getPages();
-              const page = pages[currentPage - 1];
-              const { height } = page.getSize();
+          <div className="flex gap-2 justify-center">
+            <button
+              className="bg-[#034A5A] border border-[white] text-white p-2 rounded-md w-fit h-10"
+              onClick={downloadModifiedPdf}
+            >
+              Download Modified PDF
+            </button>
+            <button
+              className="bg-[#034A5A] border border-[white] text-white p-2 rounded-md w-fit h-10"
+              onClick={() => console.log(fields)}
+            >
+              Console Fields
+            </button>
+            <button
+              className="bg-[#034A5A] border border-[white] text-white p-2 rounded-md w-fit h-10"
+              onClick={() => setFields([])}
+            >
+              Reset Fields
+            </button>
+            <button
+              className="bg-[#034A5A] border border-[white] text-white p-2 rounded-md w-fit h-10"
+              onClick={async () => {
+                const pages = pdfDoc.getPages();
+                const page = pages[currentPage - 1];
+                const { height } = page.getSize();
 
-              fields.forEach((field) => {
-                page.drawRectangle({
-                  x: field.pdfX,
-                  y: field.pdfY,
-                  // y: height - field.position.y - field.height,
-                  width: field.width,
-                  height: field.height,
-                  borderColor: rgb(0, 0, 0),
-                  borderWidth: 1.5,
+                fields.forEach((field) => {
+                  page.drawRectangle({
+                    x: field.pdfX,
+                    y: field.pdfY,
+                    // y: height - field.position.y - field.height,
+                    width: field.width,
+                    height: field.height,
+                    borderColor: rgb(0, 0, 0),
+                    borderWidth: 1.5,
+                  });
                 });
-              });
 
-              const pdfBytes = await pdfDoc.save();
-              const blob = new Blob([pdfBytes], { type: "application/pdf" });
-              const newFile = new File([blob], "modified.pdf", {
-                type: "application/pdf",
-              });
-              setPdfFile(newFile);
-              setPdfDoc(await PDFDocument.load(await newFile.arrayBuffer()));
-            }}
-          >
-            Write PDF
-          </button>
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const newFile = new File([blob], "modified.pdf", {
+                  type: "application/pdf",
+                });
+                setPdfFile(newFile);
+                setPdfDoc(await PDFDocument.load(await newFile.arrayBuffer()));
+              }}
+            >
+              Write PDF
+            </button>
+          </div>
 
-          <div className="flex gap-2 mt-2">
-            <div className="flex flex-col gap-2 ">
+          <div className="flex gap-2 mt-2 justify-center">
+            <div className="flex flex-col gap-2 mt-10">
               {/* <input
                 className="border border-gray-300 rounded-md p-2"
                 type="text"
@@ -275,9 +294,11 @@ const App = () => {
               </button>
             </div>
             <div className="text-center">
-              <div>
+              <div className="flex gap-2 items-center justify-center ">
                 <button
-                  className="bg-red-500 text-white p-2 rounded-md"
+                  className={`bg-[#034A5A] border border-[white] text-white p-2 rounded-md ${
+                    currentPage <= 1 ? "bg-gray-500" : ""
+                  }`}
                   onClick={goToPreviousPage}
                   disabled={currentPage <= 1}
                 >
@@ -287,7 +308,9 @@ const App = () => {
                   Page {currentPage} of {numPages}
                 </span>
                 <button
-                  className="bg-blue-500 text-white p-2 rounded-md"
+                  className={`bg-[#034A5A] border border-[white] text-white p-2 rounded-md ${
+                    currentPage >= numPages ? "bg-gray-500" : ""
+                  }`}
                   onClick={goToNextPage}
                   disabled={currentPage >= numPages}
                 >
@@ -303,6 +326,7 @@ const App = () => {
                   height: `${pdfDimensions.height + 2}px`,
                   overflow: "hidden",
                   padding: "1px",
+                  marginBottom: "10px",
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
