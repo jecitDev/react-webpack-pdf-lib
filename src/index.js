@@ -26,7 +26,7 @@ const App = () => {
   const [textAdded, setTextAdded] = useState(false);
   const [pdfDimensions, setPdfDimensions] = useState({ width: 0, height: 0 });
   const [fieldText, setFieldText] = useState("");
-  const [fieldSize, setFieldSize] = useState(20);
+  const [fieldSize, setFieldSize] = useState(100);
   const pdfContainerRef = useRef(null);
 
   const handleFileUpload = async (event) => {
@@ -71,7 +71,7 @@ const App = () => {
           pdfX: textPosition.x,
           pdfY: height - textPosition.y - fieldSize,
           page: currentPage,
-          width: 100, // Default width
+          width: fieldSize, // Default width
           height: fieldSize,
         },
       ]);
@@ -328,7 +328,9 @@ const App = () => {
                       cursor: "move",
                       userSelect: "none",
                       backgroundColor: "gray",
-                      fontSize: `${fieldSize}px`,
+                      // fontSize: `${fieldSize}px`,
+                      width: fieldSize,
+                      height: fieldSize,
                       zIndex: 1002,
                     }}
                   >
@@ -367,7 +369,7 @@ const App = () => {
                         cursor: "move",
                         userSelect: "none",
                         backgroundColor: "rgba(255, 255, 0, 0.3)",
-                        fontSize: `${fieldSize}px`,
+                        // fontSize: `${fieldSize}px`,
                         zIndex: 1000,
                         display: "flex",
                         alignItems: "center",
